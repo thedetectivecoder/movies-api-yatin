@@ -53,14 +53,14 @@ const createDirectorTable = (obj) => {
   });
 };
 
-const populateDirectorsTable = () => new Promise((resolve,reject) => {
+const populateDirectorsTable = () => new Promise((resolve, reject) => {
   const directorName = getUniqueDirectors(jsonData);
   createDirectorTable(directorName);
   resolve();
 });
 // createDirectorTable();
 
-const insertIntoMovies = () => new Promise((resolve,reject) => {
+const insertIntoMovies = () => new Promise((resolve, reject) => {
   jsonData.forEach(async (element) => {
     const directorName = element.Director;
     const idPromise = new Promise((resolve, reject) => {
@@ -104,4 +104,145 @@ const finalQuery = async () => {
   await insertIntoMovies();
 };
 
+// finalQuery();
 
+const resetAutoIncrement = tableName => new Promise((resolve, reject) => {
+  con.query(`ALTER TABLE ${tableName} AUTO_INCREMENT = 1`, (err, result) => {
+    if (err) reject(err);
+    console.log('Auto increment reset!');
+    resolve();
+  });
+});
+
+const getDirector = () => {
+  const sql = 'SELECT * FROM directorData';
+  con.query(sql, (err, res) => {
+    if (err) throw err;
+    res.forEach((element) => {
+      console.log(element.Director_Name);
+    });
+  });
+};
+
+// // getDirector();
+
+const selectDirectorById = (id) => {
+  const sql = `SELECT Director_Name from directorData where Id = ${id}`;
+  con.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result[0].Director_Name);
+  });
+};
+
+// selectDirectorById(2);
+
+
+const addDirector = async (name) => {
+  await resetAutoIncrement('directorData');
+  const insertDirector = new Promise((resolve, reject) => {
+    const sql = `INSERT INTO directorData (Director_Name) VALUES ("${name}")`;
+    con.query(sql, (err, result) => {
+      if (err) throw err;
+      console.log(`${name} inserted in table`);
+      resolve();
+    });
+  });
+  await insertDirector;
+};
+
+// addDirector('Frank Jr. Jr.');
+
+const updateDirector = (id, name) => {
+  const sql = `UPDATE directorData SET Director_Name = '${name}' where Id = ${id}`;
+  con.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(`Id ${id} successfully updated.`);
+  });
+};
+
+// updateDirector(36, 'Frank Jr.');
+
+
+const deleteDirector = (id) => {
+  con.query(`DELETE FROM directorData WHERE Id = ${id}`, (err, result) => {
+    if (err) throw err;
+    console.log(`Successfully Deleted row with id ${id}`);
+  });
+};
+
+// deleteDirector(37);
+
+const getMovies = () => {
+  const sql = 'SELECT * FROM moviesTable';
+  con.query(sql, (err, res) => {
+    if (err) throw err;
+    res.forEach((element) => {
+      console.log(element.Title);
+    });
+  });
+};
+
+// getMovies();
+
+const selectMovieById = (id) => {
+  const sql = `SELECT Title from moviesTable where Id = ${id}`;
+  con.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(result[0].Title);
+  });
+};
+
+// selectMovieById(50);
+
+
+const addMovie = async (rank, title, description, runtime, genre, rating, metascore, votes, grossEarningsInMil,
+  directorName, actor, year) => {
+  const dName = directorName;
+  const idDirectorPromise = () => new Promise((resolve, reject) => {
+    con.query(`SELECT Id from directorData where Director_Name = "${dName}"`, (err, result) => {
+      if (err) reject(err);
+      resolve(result[0]);
+    });
+  });
+  let directorId = await idDirectorPromise();
+  if (directorId === undefined) {
+    await addDirector(directorName);
+    directorId = await idDirectorPromise();
+  }
+  const id = directorId.Id;
+  const insertMovie = () => new Promise((resolve, reject) => {
+    const sql = `INSERT INTO moviesTable (Rank, Title, Discription, Runtime, Genre, Rating, Metascore, 
+      Votes,Gross_Earning_in_Mil, Director_Id,Actor,Year) VALUES ( ${rank}, "${title}", "${description}",
+      ${runtime}, "${genre}", ${rating}, ${metascore}, ${votes}, ${grossEarningsInMil}, ${id}, "${actor}", ${year})`;
+    con.query(sql, (err, result) => {
+      if (err) reject(err);
+      console.log('Movie added successfully');
+      resolve();
+    });
+  });
+  await insertMovie();
+};
+
+deleteDirector(37);
+// addMovie(51, 'The Dark Knight', 'How Batman deals with criminal mastermind Joker', 190, 'Action', 8.7, 82, 5412648,
+//   300.21, 'Christopher Swartz', 'Christian Bale', 2008);
+
+const updateMovie = (id, updateField, updateVal) => {
+  const sql = `UPDATE moviesTable SET ${updateField} = '${updateVal}' where Id = ${id}`;
+  con.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log(`Id ${id} successfully updated.`);
+  });
+};
+
+// updateMovie(50, 'Title', 'Casablanca');
+
+
+const deleteMovie = (id) => {
+  con.query(`DELETE FROM moviesTable WHERE Id = ${id}`, (err, result) => {
+    if (err) throw err;
+    console.log(`Successfully Deleted row with id ${id}`);
+  });
+};
+
+// deleteMovie(36);
