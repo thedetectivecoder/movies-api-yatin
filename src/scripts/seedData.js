@@ -41,7 +41,7 @@ const getUniqueDirectors = (rawJsonFile) => {
 const InsertIntoDirectorTable = (rawJsonFile) => {
   const uniqueDirectors = getUniqueDirectors(rawJsonFile);
   const insertPromise = uniqueDirectors.map(element => new Promise((resolve, reject) => {
-    con.query(`INSERT INTO directorData (Director_Name) VALUES ("${element}")`, (err, result) => {
+    con.query(`INSERT INTO directorData (Director) VALUES ("${element}")`, (err, result) => {
       if (err) throw err;
       resolve(result);
     });
@@ -65,29 +65,25 @@ const cleanData = (rawJsonFile) => {
 };
 
 const getDirectorId = name => new Promise((resolve, reject) => {
-  con.query(`SELECT id from directorData where Director_Name like "${name}"`, (err, result) => {
+  con.query(`SELECT id from directorData where Director like "${name}"`, (err, result) => {
     if (err) throw err;
     resolve(result[0].id);
   });
 });
 
 const insertIntoMovies = (arrOfObj) => {
-  const insertPromise = arrOfObj.map(element => new Promise(async (resolved, rejected) => {
+  const insertPromise = arrOfObj.map(element => new Promise(async (resolve, reject  ) => {
     const directorName = element.Director;
     getDirectorId(directorName).then((directorId) => {
-      const sql = `INSERT INTO moviesTable (Rank, Title, Discription, Runtime, Genre, Rating, Metascore, 
+      const sql = `INSERT INTO moviesTable (Rank, Title, Description, Runtime, Genre, Rating, Metascore, 
         Votes,Gross_Earning_in_Mil, Director_Id,Actor,Year) VALUES 
       (${element.Rank},"${element.Title}","${element.Description}",${element.Runtime}, 
       "${element.Genre}", ${element.Rating},${element.Metascore},${element.Votes},${element.Gross_Earning_in_Mil},
       ${directorId},"${element.Actor}",${element.Year})`;
-
-      const insertMoviePromise = new Promise((resolve, reject) => {
-        con.query(sql, (err1) => {
-          if (err1) reject(err1);
-          resolve();
-        });
+      con.query(sql, (err1) => {
+        if (err1) reject(err1);
+        resolve();
       });
-      resolved();
     });
   }));
   Promise.all(insertPromise);
@@ -98,9 +94,9 @@ const insertIntoMovies = (arrOfObj) => {
 const finalQuery = async () => {
   await dropTable('moviesTable');
   await dropTable('directorData');
-  await createTable('directorData', '(Id INT AUTO_INCREMENT PRIMARY KEY,Director_Name VARCHAR(255))');
+  await createTable('directorData', '(Id INT AUTO_INCREMENT PRIMARY KEY,Director VARCHAR(255))');
   await createTable('moviesTable', `(Id INT AUTO_INCREMENT PRIMARY KEY,Rank INT(10), Title VARCHAR(255), 
-  Discription VARCHAR(255),Runtime INTEGER(5),Genre VARCHAR(255), Rating DECIMAL(2,1),
+  Description VARCHAR(255),Runtime INTEGER(5),Genre VARCHAR(255), Rating DECIMAL(2,1),
   Metascore INTEGER(3), Votes INTEGER(25), Gross_Earning_in_Mil DECIMAL(6,2),Director_Id INTEGER(10),Actor VARCHAR(255),
   Year INTEGER(5), FOREIGN KEY(Director_Id) REFERENCES directorData(Id) ON DELETE CASCADE)`);
   await cleanData(jsonData);
@@ -109,28 +105,3 @@ const finalQuery = async () => {
 };
 
 finalQuery();
-
-
-
-const getMovies = async () => new Promise((resolve, reject) => {
-  const sql = `SELECT m.Id,Rank, Title, Discription, Runtime, Genre, Rating, Metascore, Votes,Gross_Earning_in_Mil,
-  Director_Id,Actor,Year,Director_Name FROM moviesTable m INNER JOIN directorData d ON m.Id = d.Id`;
-  con.query(sql, (err, res) => {
-    if (err) reject(err);
-    resolve(JSON.stringify(res));
-  });
-});
-
-// getMovies();
-
-const selectMovieById = id => new Promise((resolve, reject) => {
-  const sql = `SELECT Title from moviesTable where Id = ${id}`;
-  con.query(sql, (err, result) => {
-    if (err) throw err;
-    console.log(result[0].Title);
-    resolve();
-  });
-});
-
-// selectMovieById(50);
-

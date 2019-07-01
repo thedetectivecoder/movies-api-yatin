@@ -13,45 +13,45 @@ const getDirector = async () => {
   return directorPromise;
 };
 
-// getDirector();
+// getDirector().then(data => { console.log(data); });
 
 const selectDirectorById = id => new Promise((resolve, reject) => {
-  const sql = `SELECT Director_Name from directorData where Id = ${id}`;
+  const sql = `SELECT Director from directorData WHERE Id = ${id}`;
   con.query(sql, (err, result) => {
     if (result.length === 0) {
       resolve(console.log('Id not present'));
     } else {
-      resolve(result[0].Director_Name);
+      if (err) reject(err);
+      resolve(result);
     }
   });
 });
 
-// selectDirectorById(60);
+// selectDirectorById(156).then((data) => { console.log(data); });
 
-const addDirector = (name) => {
+const addDirector = (dirObj) => {
   const insertDirector = new Promise((resolve, reject) => {
-    const sql = `INSERT INTO directorData (Director_Name) VALUES ("${name}")`;
-    con.query(sql, (err, result) => {
+    const sql = 'INSERT INTO directorData SET ?';
+    con.query(sql, dirObj, (err, result) => {
       if (err) throw err;
-      console.log(`${name} inserted in table`);
-      resolve();
+      resolve(result);
     });
   });
   return insertDirector;
 };
 
-// addDirector('Frank Jr. Jr.');
+// addDirector({
+//   Director:"Yatin" });
 
-const updateDirector = (id, name) => new Promise((resolve, reject) => {
-  const sql = `UPDATE directorData SET Director_Name = '${name}' where Id = ${id}`;
+const updateDirector = (id, dirObj) => new Promise((resolve, reject) => {
+  const sql = `UPDATE directorData SET Director = '${dirObj.Director}' where Id = ${id}`;
   con.query(sql, (err, result) => {
     if (err) throw err;
-    console.log(`Id ${id} successfully updated.`);
-    resolve();
+    resolve(result);
   });
 });
 
-// updateDirector(36, 'Frank Jr.');
+// updateDirector(36, { Director:"YATin BUrhmi"});
 
 const deleteDirector = async id => new Promise((resolve, reject) => {
   con.query(`DELETE FROM directorData WHERE Id = ${id}`, (err, result) => {
@@ -63,3 +63,11 @@ const deleteDirector = async id => new Promise((resolve, reject) => {
 
 
 // deleteDirector(36);
+
+module.exports = {
+  getDirector,
+  addDirector,
+  selectDirectorById,
+  deleteDirector,
+  updateDirector,
+}
