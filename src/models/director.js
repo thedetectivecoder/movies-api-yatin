@@ -1,66 +1,50 @@
-const connectionFile = require('../utils/connection');
+const models = require('../models/models');
 
-const con = connectionFile.connection();
+/* findaLL() => query for all records. Filter using where operator
+*
+*/
 
 const getDirector = async () => {
-  const sql = 'SELECT * FROM directorData';
-  const directorPromise = new Promise((resolve, reject) => {
-    con.query(sql, (err, res) => {
-      if (err) reject(err);
-      resolve(JSON.stringify(res));
+  const allDirectorPromiseArray = await models.Director.findAll();
+  const arrObj = [];
+  const getAllDirectorsPromise = new Promise((resolve, reject) => {
+    allDirectorPromiseArray.forEach((element) => {
+      arrObj.push(element.dataValues);
     });
+    resolve(arrObj);
   });
-  return directorPromise;
+  return getAllDirectorsPromise;
 };
 
-// getDirector().then(data => { console.log(data); });
+// getAllDirectors().then(data => { console.log(data)});
 
-const selectDirectorById = id => new Promise((resolve, reject) => {
-  const sql = `SELECT Director from directorData WHERE Id = ${id}`;
-  con.query(sql, (err, result) => {
-    if (result.length === 0) {
-      resolve(console.log('Id not present'));
-    } else {
-      if (err) reject(err);
-      resolve(result);
-    }
-  });
-});
-
-// selectDirectorById(156).then((data) => { console.log(data); });
-
-const addDirector = (dirObj) => {
-  const insertDirector = new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO directorData SET ?';
-    con.query(sql, dirObj, (err, result) => {
-      if (err) throw err;
-      resolve(result);
-    });
-  });
-  return insertDirector;
+const selectDirectorById = async (idPass) => {
+  const getDirectorByIdPromise = await models.Director.findOne({ where: { id: idPass } });
+  if (getDirectorByIdPromise !== null) {
+    return getDirectorByIdPromise.dataValues;
+  } return console.log('Id not present');
 };
 
-// addDirector({
-//   Director:"Yatin" });
+// getDirectorById(35);
 
-const updateDirector = (id, dirObj) => new Promise((resolve, reject) => {
-  const sql = `UPDATE directorData SET Director = '${dirObj.Director}' where Id = ${id}`;
-  con.query(sql, (err, result) => {
-    if (err) throw err;
-    resolve(result);
-  });
-});
+const addDirector = async (dirObj) => {
+  const addDirPromise = await models.Director.create({ Director: dirObj.Director });
+  return addDirPromise;
+};
 
-// updateDirector(36, { Director:"YATin BUrhmi"});
+// addDirector({ Director: 'Yatin' });
 
-const deleteDirector = async id => new Promise((resolve, reject) => {
-  con.query(`DELETE FROM directorData WHERE Id = ${id}`, (err, result) => {
-    if (err) reject(err);
-    console.log(`Successfully Deleted row with id ${id}`);
-    resolve();
-  });
-});
+const updateDirector = async (idPass, dirObj) => {
+  const updateDirPromise = await models.Director.update(dirObj, { where: { id: idPass } });
+  return updateDirPromise;
+};
 
+// updateDirector(37, { Director: 'Yatin Burhmi' });
+
+const deleteDirector = async (idPass) => {
+  const deleteDirPromise = await models.Director.destroy({ where: { id: idPass } });
+  return deleteDirPromise;
+};
 
 // deleteDirector(36);
 
