@@ -1,6 +1,13 @@
 // load joi module
 const Joi = require('joi');
 
+function idValidation(id) {
+  const idSchema = Joi.object().keys({
+    id: Joi.number().required().min(1).max(100),
+  });
+  return Joi.validate(id, idSchema);
+}
+
 function directorValidation(dirObj) {
   const directorSchema = Joi.object().keys({
     Director: Joi.string().required(),
@@ -46,6 +53,7 @@ function updateMovieValidation(movObj) {
 
 
 module.exports = {
+  idValidation,
   directorValidation,
   addMovieValidation,
   updateMovieValidation,
