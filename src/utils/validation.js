@@ -1,11 +1,11 @@
 // load joi module
 const Joi = require('joi');
 
-function idValidation(id){
+function idValidation(id) {
   const idSchema = Joi.object().keys({
-    id: Joi.number().required().min(1).max(100);
-  })
-  return Joi.validate(id, idSchema)
+    id: Joi.number().required().min(1).max(100),
+  });
+  return Joi.validate(id, idSchema);
 }
 
 function directorValidation(dirObj) {

@@ -19,7 +19,7 @@ const selectDirectorById = id => new Promise((resolve, reject) => {
   const sql = `SELECT Director from directorData WHERE Id = ${id}`;
   con.query(sql, (err, result) => {
     if (result.length === 0) {
-      resolve(console.log('Id not present'));
+      resolve(result);
     } else {
       if (err) reject(err);
       resolve(result);
@@ -53,11 +53,11 @@ const updateDirector = (id, dirObj) => new Promise((resolve, reject) => {
 
 // updateDirector(36, { Director:"YATin BUrhmi"});
 
-const deleteDirector = async id => new Promise((resolve, reject) => {
+const deleteDirector = id => new Promise((resolve, reject) => {
   con.query(`DELETE FROM directorData WHERE Id = ${id}`, (err, result) => {
     if (err) reject(err);
     console.log(`Successfully Deleted row with id ${id}`);
-    resolve();
+    resolve(result);
   });
 });
 
@@ -70,4 +70,4 @@ module.exports = {
   selectDirectorById,
   deleteDirector,
   updateDirector,
-}
+};

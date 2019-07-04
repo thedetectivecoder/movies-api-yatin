@@ -11,7 +11,7 @@ const getMovies = async () => new Promise((resolve, reject) => {
     resolve(JSON.stringify(res));
   });
 });
- 
+
 const selectMovieById = id => new Promise((resolve, reject) => {
   const sql = `SELECT Title from moviesTable where Id = ${id}`;
   con.query(sql, (err, result) => {
@@ -25,7 +25,7 @@ selectMovieById(50);
 const addMovie = (moviesObj) => {
   const addmoviePromise = new Promise((resolve, reject) => {
     const sql = 'INSERT INTO moviesTable SET ?';
-    con.query(sql,moviesObj, (err, res) => {
+    con.query(sql, moviesObj, (err, res) => {
       if (err) reject(err);
       resolve(res);
     });
@@ -61,9 +61,8 @@ const updateMovie = (id, obj) => new Promise((resolve, reject) => {
   updateColumns = updateColumns.substring(0, updateColumns.length - 1);
   const sql = `UPDATE moviesTable SET ${updateColumns} where Id = ${id}`;
   con.query(sql, (err, result) => {
-    if (err) throw err;
-    console.log(`Id ${id} successfully updated.`);
-    resolve();
+    if (err) reject(err);
+    resolve(result);
   });
 });
 
@@ -72,12 +71,12 @@ const updateMovie = (id, obj) => new Promise((resolve, reject) => {
 //   Rating: 8.9,
 // });
 
-const deleteMovie = (id) => {
+const deleteMovie = id => new Promise((resolve, reject) => {
   con.query(`DELETE FROM moviesTable WHERE Id = ${id}`, (err, result) => {
-    if (err) throw err;
-    console.log(`Successfully Deleted row with id ${id}`);
+    if (err) reject(err);
+    resolve(result);
   });
-};
+});
 
 // deleteMovie(51);
 
