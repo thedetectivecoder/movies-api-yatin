@@ -56,7 +56,8 @@ router.put('/:id', async (req, res, next) => {
       res.status(400).send(`${idValidRes.error.name} : ${idValidRes.error.details[0].message}`);
     } else {
       const updateMovieObj = await dir.updateMovie(req.params.id, req.body);
-      if (updateMovieObj.affectedRows === 0) {
+      console.log(updateMovieObj[0]);
+      if (updateMovieObj[0] === 0) {
         res.status(404).send(`Movie with Id: ${req.params.id} not found`);
       } else {
         res.send(`Movie with Id: ${req.params.id} successfully updated.`);
@@ -74,7 +75,7 @@ router.delete('/:id', async (req, res, next) => {
       res.status(400).send(`${validRes.error.name} : ${validRes.error.details[0].message}`);
     } else {
       const movName = await dir.deleteMovie(req.params.id);
-      if (movName.affectedRows === 0) {
+      if (movName === 0) {
         res.status(404).send(`Movie with Id: ${req.params.id} not found`);
       } else {
         res.send(`Movie with Id: ${req.params.id} deleted.`);

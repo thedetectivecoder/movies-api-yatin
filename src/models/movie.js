@@ -20,7 +20,7 @@ const selectMovieById = async (idPass) => {
   if (getMovieByIdPromise !== null) {
     // console.log(getMovieByIdPromise);
     return getMovieByIdPromise.dataValues;
-  } return console.log('Id not present');
+  } return getMovieByIdPromise;
 };
 
 // getMovieById(36);
@@ -44,8 +44,8 @@ const updateMovie = async (idPass, dirObj) => {
 //   Title: 'SuperMan Returns',
 // });
 
-const deleteMovie = async (idPass) => {
-  const deleteDirPromise = await models.Movie.destroy({ where: { id: idPass } });
+const deleteMovie = (idPass) => {
+  const deleteDirPromise = models.Movie.destroy({ where: { id: idPass } });
   return deleteDirPromise;
 };
 

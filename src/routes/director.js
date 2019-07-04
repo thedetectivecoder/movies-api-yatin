@@ -20,7 +20,7 @@ router.get('/:id', async (req, res, next) => {
       res.status(400).send(`${validRes.error.name} : ${validRes.error.details[0].message}`);
     } else {
       const dirName = await dir.selectDirectorById(req.params.id);
-      if (dirName.length === 0) {
+      if (dirName === undefined) {
         res.status(404).send(`Director with id ${req.params.id} not found`);
       } else {
         res.send(dirName);
@@ -55,8 +55,7 @@ router.put('/:id', async (req, res, next) => {
       res.status(400).send(`${idValidRes.error.name} : ${idValidRes.error.details[0].message}`);
     } else {
       const updateDir = await dir.updateDirector(req.params.id, req.body);
-      console.log(updateDir);
-      if (updateDir.affectedRows === 0) {
+      if (updateDir[0] === 0) {
         res.status(404).send(`Director with id ${req.params.id} not found`);
       } else {
         res.send(`Director with id ${req.params.id} updated Successfully`);
@@ -74,7 +73,7 @@ router.delete('/:id', async (req, res, next) => {
       res.status(400).send(`${idValidRes.error.name} : ${idValidRes.error.details[0].message}`);
     } else {
       const delDir = await dir.deleteDirector(req.params.id);
-      if (delDir.affectedRows === 0) {
+      if (delDir === 0) {
         res.status(404).send(`Director with id ${req.params.id} not found`);
       } else {
         res.send(`Director with id ${req.params.id} deleted successfully`);
